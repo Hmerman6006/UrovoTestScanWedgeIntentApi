@@ -10,4 +10,4 @@ References:  *[ProfileID](https://en.urovo.com/developer/android/device/scanner/
 Tested on Urovo DT50Q, but does not create the profile or gather the intent barcode on scan yet.
 
 # How it works
-The SW Utility creates the profile and sets the profile params with the Api categories in the activity's `onCreate` method.  The Main Activity's `onStart` method registers a brodcast receiver to listen to scanner status.
+The SW Utility creates the profile and sets the profile params with the Api categories in the activity's `onCreate` method.  The Main Activity's `onStart` method registers a broadcast receiver to listen to scanner status.
