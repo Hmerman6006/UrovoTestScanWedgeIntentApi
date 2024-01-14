@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">UrovoTestScanWedge</string>
+
+    <!-- Do no translate -->
+    <string name="activity_intent_filter_action">za.co.edataleaf.urovotestscanwedge.ACTION</string>
+    <string name="activity_intent_filter_main_scan">za.co.edataleaf.urovotestscanwedge.MainActivity.SCAN</string>
+
+    <string name="activity_main">za.co.edataleaf.urovotestscanwedge.MainActivity</string>
+    
+    <string name="scanwedge_intent_key_source">com.ubx.datawedge.source</string>
+    <string name="scanwedge_intent_key_label_type">com.ubx.datawedge.label_type</string>
+    <string name="scanwedge_intent_key_data">com.ubx.datawedge.barcode_string</string>
+    <!-- ./ do no translate -->
+</resources>
