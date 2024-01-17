@@ -1,3 +1,6 @@
+# About ScanWedge Intent Api
+Needs ScanWedge version 2.1.19_20230220
+
 # Phase
 Test
 
