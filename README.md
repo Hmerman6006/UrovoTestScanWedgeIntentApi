@@ -15,13 +15,13 @@ Sdk references: *[Sdk Release Android](https://github.com/urovosamples/SDK_Relea
 *[Android on Sdk Best Practice](https://developer.android.com/guide/practices/sdk-best-practices)*
 
 # So far
-Tested on Urovo DT50Q with ScanWedge v2.1.9_20210729 and Sdk, it scans.  For Intent Api, ~~it does not create the profile or gather the intent barcode on scan yet~~ need high ScanWedge version enable Urovo phone.
+Tested on Urovo DT50Q with ScanWedge v2.1.9_20210729 and Sdk, it scans.  For Intent Api, ~~it does not create the profile or gather the intent barcode on scan yet~~ need high ScanWedge version enabled Urovo phone.
 
 # How it works
 Open App and scan.
 
-## How it is suppose to works
+## How it is suppose to work
 The SW Utility creates the profile and sets the profile params with the Api categories in the activity's `onCreate` method.  The Main Activity's `onStart` method registers a broadcast receiver to listen to scanner status.
 
 # What needs to be done
-Event to monitor scanner status with Sdk.
+Event to monitor scanner status with Sdk.  Test pure intent Api.
