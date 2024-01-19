@@ -4,4 +4,6 @@ interface OnReceiverListenerInterface {
     fun onReceivingScannerStatusBroadcast(status: String)
 
     var receiverActive: Boolean
+
+    fun onReceivingScannerBarcodeBroadcast(barcode:String)
 }
