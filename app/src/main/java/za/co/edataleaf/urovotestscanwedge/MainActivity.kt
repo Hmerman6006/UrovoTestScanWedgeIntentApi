@@ -9,6 +9,7 @@ import android.device.scanner.configuration.PropertyID
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.KeyEvent
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -55,7 +56,7 @@ class MainActivity() : ComponentActivity(), OnReceiverListenerInterface {
     override fun onReceivingScannerBarcodeBroadcast(barcode: String) {
         viewModel.setBarcode(barcode)
 
-        if(mScanManager.scannerState) viewModel.setStatus("READY")
+        if(mScanManager.scannerState) viewModel.setStatus(getString(R.string.ready))
     }
 
     private lateinit var swReceiver: SwReceiver
@@ -97,7 +98,7 @@ class MainActivity() : ComponentActivity(), OnReceiverListenerInterface {
 
         setContent {
             UrovoTestScanWedgeTheme {
-                // A surface container using the 'background' color from the theme
+
                 val status by viewModel.scannerStatus.collectAsState()
                 val barcode by viewModel.barcodeResult.collectAsState(initial = "")
 
@@ -136,21 +137,38 @@ class MainActivity() : ComponentActivity(), OnReceiverListenerInterface {
         }
     }
 
+    override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
+        Log.d("onKeyUp", keyCode.toString())
+        if(keyCode >= SmInterface.SCAN_KEYCODE[0] && keyCode <= SmInterface.SCAN_KEYCODE[SmInterface.SCAN_KEYCODE.size - 1]) {
+            viewModel.setStatus(getString(R.string.ready))
+        }
+        return super.onKeyUp(keyCode, event)
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        Log.d("onKeyDown", keyCode.toString())
+        if(keyCode >= SmInterface.SCAN_KEYCODE[0] && keyCode <= SmInterface.SCAN_KEYCODE[SmInterface.SCAN_KEYCODE.size - 1]) {
+            viewModel.setStatus(getString(R.string.scanning))
+        }
+        return super.onKeyDown(keyCode, event)
+    }
+
     override fun onResume() {
         super.onResume()
+
         if(::mScanManager.isInitialized && ::smReceiver.isInitialized && SmInterface.openScanner(mScanManager)) {
             Log.d("onResume","register")
             Log.d("openScanner2","${mScanManager.outputMode}")
-            viewModel.setStatus("SETUP")
+            viewModel.setStatus(getString(R.string.starting_ellipses))
 
             val filter = IntentFilter()
-            val idbuf = intArrayOf(
+            val idBuf = intArrayOf(
                 PropertyID.WEDGE_INTENT_ACTION_NAME,
                 PropertyID.WEDGE_INTENT_DATA_STRING_TAG
             )
-            val value_buf = mScanManager.getParameterString(idbuf)
-            if (value_buf != null && value_buf[0] != null && value_buf[0] != "") {
-                filter.addAction(value_buf[0])
+            val valueBuf = mScanManager.getParameterString(idBuf)
+            if (valueBuf != null && valueBuf[0] != null && valueBuf[0] != "") {
+                filter.addAction(valueBuf[0])
             } else {
                 filter.addAction(ACTION_DECODE)
             }
@@ -162,7 +180,7 @@ class MainActivity() : ComponentActivity(), OnReceiverListenerInterface {
 
             }
 
-            if(mScanManager.scannerState) viewModel.setStatus("READY")
+            if(mScanManager.scannerState) viewModel.setStatus(getString(R.string.ready))
 //            SmInterface.startDecode(mScanManager)
         }
 
@@ -175,7 +193,7 @@ class MainActivity() : ComponentActivity(), OnReceiverListenerInterface {
             Log.d("onPause","stop")
             SmInterface.stopDecode(mScanManager)
 
-            if(!mScanManager.scannerState) viewModel.setStatus("STOP")
+            if(!mScanManager.scannerState) viewModel.setStatus(getString(R.string.stopped))
 //            SwHelper.unRegisterScannerReceiver(this, receiver = receiver)
         }
 

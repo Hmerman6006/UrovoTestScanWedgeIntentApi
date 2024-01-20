@@ -3,10 +3,18 @@
 
     <!-- Do no translate -->
     <string name="activity_intent_filter_action">za.co.edataleaf.urovotestscanwedge.ACTION</string>
-    <string name="activity_intent_filter_main_scan">android.intent.ACTION_DECODE_DATA</string>
+    <string name="activity_intent_filter_main_scan">za.co.edataleaf.mainactivity.SCAN</string>
 
-    <string name="activity_main">android.intent.ACTION_DECODE_DATA</string>
-    
+    <string name="urovo_sdk_scan_intent">android.intent.ACTION_DECODE_DATA</string>
+
+    <string name="ready">READY</string>
+    <string name="starting_ellipses">STARTING…</string>
+    <string name="stopped">STOPPED</string>
+    <string name="scanning">SCANNING</string>
+    <string name="scan_failure">SCAN FAILURE</string>
+    <string name="decoding">DECODING</string>
+    <string name="decoding_fail">DECODING FAIL</string>
+
     <string name="scanwedge_intent_key_source">com.ubx.datawedge.source</string>
     <string name="scanwedge_intent_key_label_type">com.ubx.datawedge.label_type</string>
     <string name="scanwedge_intent_key_data">barcode_string</string>

@@ -14,6 +14,8 @@ class SmInterface {
 
     companion object {
 
+        val SCAN_KEYCODE = intArrayOf(520, 521, 522, 523)
+
         /**
          * Tag set to obtain the output data as a byte array. In the case of concatenated barcodes, the decode data is concatenated and sent out as a single array.
          */

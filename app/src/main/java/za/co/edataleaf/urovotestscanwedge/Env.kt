@@ -5,7 +5,7 @@ import android.os.Build
 class Env {
     companion object {
 
-        var manufacturer = Build.MANUFACTURER
-        var model = Build.MODEL
+        var manufacturer: String = Build.MANUFACTURER
+        var model: String = Build.MODEL
     }
 }
