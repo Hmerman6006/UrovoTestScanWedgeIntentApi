@@ -1,5 +1,5 @@
 # About
-Needs ScanManager SDK release `platform_sdk_v4.1.0326.jar` in `libs` directory or for pure intent use without Sdk, ScanWedge version 2.1.19_20230220
+Needs ScanManager SDK release *[platform_sdk_v4.1.0326.jar](https://github.com/urovosamples/SDK_ReleaseforAndroid/tree/master/Samples/ScanManager/app/libs)* in `libs` directory or for pure intent use without Sdk, ScanWedge version 2.1.19_20230220
 
 # Phase
 Epsilon Test
@@ -24,4 +24,4 @@ Open App and scan.
 The SW Utility creates the profile and sets the profile params with the Api categories in the activity's `onCreate` method.  The Main Activity's `onStart` method registers a broadcast receiver to listen to scanner status.
 
 # What needs to be done
-Event to monitor scanner status with Sdk.  Test pure intent Api.
+Test pure intent Api.
