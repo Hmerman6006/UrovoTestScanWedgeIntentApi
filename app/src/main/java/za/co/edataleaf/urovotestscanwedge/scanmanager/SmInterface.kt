@@ -36,52 +36,94 @@ class SmInterface {
          */
         const val BARCODE_LENGTH_TAG = ScanManager.BARCODE_LENGTH_TAG
 
-        fun openScanner(scanManager: ScanManager): Boolean {
-            var state = scanManager.scannerState
-            if(!state) {
-                state = scanManager.openScanner()
-            }
-            scanManager.enableAllSymbologies(true)
-            Log.d("openScanner","$state || ${scanManager.outputMode}")
+        /**
+         * Check if hard button scanner is pushed
+         *
+         * @return Boolean
+         */
+        @JvmStatic
+        fun isKeyScanning(keyCode: Int): Boolean {
+            return keyCode >= SCAN_KEYCODE[0] && keyCode <= SCAN_KEYCODE[SCAN_KEYCODE.size - 1]
+        }
 
-            return state && (scanManager.outputMode == 0 || scanManager.switchOutputMode(0))
+        /**
+         * Setup Scanner
+         *
+         * @return Boolean
+         */
+        @JvmStatic
+        fun openScanner(scanManager: ScanManager): Boolean {
+            return try {
+                var state = scanManager.scannerState
+                if(!state) {
+                    state = scanManager.openScanner()
+                }
+                scanManager.enableAllSymbologies(true)
+
+                state && (scanManager.outputMode == 0 || scanManager.switchOutputMode(0))
+            } catch (e: java.lang.RuntimeException) {
+                false
+            } catch (e: Exception) {
+                false
+            }
         }
 
         /**
          * ScanManager.startDecode
          */
+        @JvmStatic
         fun startDecode(scanManager: ScanManager) {
-            if (!scanManager.scannerState) {
-                return
-            }
+            try {
+                if (!scanManager.scannerState) {
+                    return
+                }
 
-            if (scanManager.triggerLockState) {
-                Log.d("sm","startDecode ignore, Scan lockTrigger state:${scanManager.triggerLockState}")
+                if (scanManager.triggerLockState) {
+                    return
+                }
+                scanManager.startDecode()
+            } catch (e: java.lang.RuntimeException) {
+                return
+            } catch (e: Exception) {
                 return
             }
-            scanManager.startDecode()
         }
 
         /**
          * ScanManager.stopDecode
          */
+        @JvmStatic
         fun stopDecode(scanManager: ScanManager) {
-            if (!scanManager.scannerState) {
+            try {
 
+                if (!scanManager.scannerState) {
+
+                    return
+                }
+                scanManager.stopDecode()
+            } catch (e: java.lang.RuntimeException) {
+                return
+            } catch (e: Exception) {
                 return
             }
-            scanManager.stopDecode()
         }
 
         /**
          * ScanManager.closeScanner
          *
-         * @return
+         * @return Boolean
          */
+        @JvmStatic
         fun closeScanner(scanManager: ScanManager): Boolean {
-            scanManager.stopDecode()
+            return try {
+                scanManager.stopDecode()
 
-            return scanManager.closeScanner()
+                scanManager.closeScanner()
+            } catch (e: java.lang.RuntimeException) {
+                false
+            } catch (e: Exception) {
+                false
+            }
         }
 
     }

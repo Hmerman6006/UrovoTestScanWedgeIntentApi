@@ -1,9 +1,7 @@
 package za.co.edataleaf.urovotestscanwedge
 
 import android.content.Context
-import android.content.Intent
 import android.content.IntentFilter
-import android.device.ScanManager
 import android.device.ScanManager.ACTION_DECODE
 import android.device.scanner.configuration.PropertyID
 import android.os.Build
@@ -32,10 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import za.co.edataleaf.urovotestscanwedge.broadcast_receivers.SmReceiver
-import za.co.edataleaf.urovotestscanwedge.broadcast_receivers.SwReceiver
 import za.co.edataleaf.urovotestscanwedge.scanmanager.SmInterface
-import za.co.edataleaf.urovotestscanwedge.scanwedge.SwHelper
 import za.co.edataleaf.urovotestscanwedge.ui.theme.UrovoTestScanWedgeTheme
 import za.co.edataleaf.urovotestscanwedge.viewmodels.MainViewModel
 import za.co.edataleaf.urovotestscanwedge.viewmodels.MainViewModelFactory
@@ -56,13 +51,10 @@ class MainActivity() : ComponentActivity(), OnReceiverListenerInterface {
     override fun onReceivingScannerBarcodeBroadcast(barcode: String) {
         viewModel.setBarcode(barcode)
 
-        if(mScanManager.scannerState) viewModel.setStatus(getString(R.string.ready))
+        if(env.mScanManager.scannerState) viewModel.setStatus(getString(R.string.ready))
     }
 
-    private lateinit var swReceiver: SwReceiver
-    private lateinit var smReceiver: SmReceiver
-
-    private lateinit var mScanManager: ScanManager
+    private val env = Env()
 
 //    override fun onNewIntent(intent: Intent?) {
 //        super.onNewIntent(intent)
@@ -85,16 +77,7 @@ class MainActivity() : ComponentActivity(), OnReceiverListenerInterface {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        mScanManager = ScanManager()
-        if(::mScanManager.isInitialized) {
-            smReceiver = SmReceiver()
-            smReceiver.setOnReceiverListenerInterface(this)
-        } else {
-
-            swReceiver = SwReceiver()
-//        SwUtilities.createSwProfile(
-//            this, this.resources.getString(R.string.activity_intent_filter_main_scan))
-        }
+        env.initScanEnv(this, getString(R.string.activity_intent_filter_main_scan))
 
         setContent {
             UrovoTestScanWedgeTheme {
@@ -139,7 +122,7 @@ class MainActivity() : ComponentActivity(), OnReceiverListenerInterface {
 
     override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
         Log.d("onKeyUp", keyCode.toString())
-        if(keyCode >= SmInterface.SCAN_KEYCODE[0] && keyCode <= SmInterface.SCAN_KEYCODE[SmInterface.SCAN_KEYCODE.size - 1]) {
+        if(SmInterface.isKeyScanning(keyCode = keyCode)) {
             viewModel.setStatus(getString(R.string.ready))
         }
         return super.onKeyUp(keyCode, event)
@@ -147,7 +130,7 @@ class MainActivity() : ComponentActivity(), OnReceiverListenerInterface {
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         Log.d("onKeyDown", keyCode.toString())
-        if(keyCode >= SmInterface.SCAN_KEYCODE[0] && keyCode <= SmInterface.SCAN_KEYCODE[SmInterface.SCAN_KEYCODE.size - 1]) {
+        if(SmInterface.isKeyScanning(keyCode = keyCode)) {
             viewModel.setStatus(getString(R.string.scanning))
         }
         return super.onKeyDown(keyCode, event)
@@ -156,9 +139,9 @@ class MainActivity() : ComponentActivity(), OnReceiverListenerInterface {
     override fun onResume() {
         super.onResume()
 
-        if(::mScanManager.isInitialized && ::smReceiver.isInitialized && SmInterface.openScanner(mScanManager)) {
+        if(env.hasScanManager() && env.hasSmReceiver() && SmInterface.openScanner(env.mScanManager)) {
             Log.d("onResume","register")
-            Log.d("openScanner2","${mScanManager.outputMode}")
+            Log.d("openScanner2","${env.mScanManager.outputMode}")
             viewModel.setStatus(getString(R.string.starting_ellipses))
 
             val filter = IntentFilter()
@@ -166,7 +149,7 @@ class MainActivity() : ComponentActivity(), OnReceiverListenerInterface {
                 PropertyID.WEDGE_INTENT_ACTION_NAME,
                 PropertyID.WEDGE_INTENT_DATA_STRING_TAG
             )
-            val valueBuf = mScanManager.getParameterString(idBuf)
+            val valueBuf = env.mScanManager.getParameterString(idBuf)
             if (valueBuf != null && valueBuf[0] != null && valueBuf[0] != "") {
                 filter.addAction(valueBuf[0])
             } else {
@@ -174,44 +157,44 @@ class MainActivity() : ComponentActivity(), OnReceiverListenerInterface {
             }
 
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                this@MainActivity.registerReceiver(smReceiver, filter, Context.RECEIVER_EXPORTED)
+                this@MainActivity.registerReceiver(env.smReceiver, filter, Context.RECEIVER_EXPORTED)
             } else {
-                this@MainActivity.registerReceiver(smReceiver, filter)
+                this@MainActivity.registerReceiver(env.smReceiver, filter)
 
             }
 
-            if(mScanManager.scannerState) viewModel.setStatus(getString(R.string.ready))
-//            SmInterface.startDecode(mScanManager)
+            if(env.mScanManager.scannerState) viewModel.setStatus(getString(R.string.ready))
+//            SmInterface.startDecode(env.mScanManager)
         }
 
-//            SwHelper.registerScannerReceiver(this, receiver = receiver)
+//            SwHelper.registerScannerReceiver(this, receiver = env.swReceiver)
     }
 
     override fun onPause() {
         super.onPause()
-        if(::mScanManager.isInitialized) {
+        if(env.hasScanManager()) {
             Log.d("onPause","stop")
-            SmInterface.stopDecode(mScanManager)
+            SmInterface.stopDecode(env.mScanManager)
 
-            if(!mScanManager.scannerState) viewModel.setStatus(getString(R.string.stopped))
-//            SwHelper.unRegisterScannerReceiver(this, receiver = receiver)
+            if(!env.mScanManager.scannerState) viewModel.setStatus(getString(R.string.stopped))
+//            SwHelper.unRegisterScannerReceiver(this, receiver = env.swReceiver)
         }
 
-        if(::smReceiver.isInitialized) {
+        if(env.hasSmReceiver()) {
             Log.d("onPause","unregisterReceiver")
-            this@MainActivity.unregisterReceiver(smReceiver)
-//            SwHelper.unRegisterScannerReceiver(this, receiver = receiver)
+            this@MainActivity.unregisterReceiver(env.smReceiver)
+//            SwHelper.unRegisterScannerReceiver(this, receiver = env.swReceiver)
         }
     }
 
 //    override fun onStart() {
 //        super.onStart()
-//        SwHelper.registerScannerReceiver(this, receiver = receiver)
+//        SwHelper.registerScannerReceiver(this, receiver = env.swReceiver)
 //    }
 //
 //    override fun onStop() {
 //        super.onStop()
-//        SwHelper.unRegisterScannerReceiver(this, receiver = receiver)
+//        SwHelper.unRegisterScannerReceiver(this, receiver = env.swReceiver)
 //    }
 }
 
